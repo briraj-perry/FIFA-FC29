@@ -1,0 +1,6 @@
+{
+  "name": "FC 26: HyperMotion V",
+  "description": "Next-gen 3D football simulation engineered for high-end GPUs with real-time PBR stadium lighting, deep player equipment customization, and autonomous Tactical AI Mode.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

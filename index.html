@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>FC 26: HyperMotion V — Next-Gen 3D Football</title>
+    <meta name="description" content="Next-gen 3D football simulation engineered for high-end GPUs with real-time PBR stadium lighting, deep player equipment customization, and autonomous Tactical AI Mode." />
+    <meta property="og:title" content="FC 26: HyperMotion V — Next-Gen 3D Football" />
+    <meta property="og:description" content="Next-gen 3D football simulation engineered for high-end GPUs with real-time PBR stadium lighting, deep player equipment customization, and autonomous Tactical AI Mode." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800&family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      // Gracefully ignore Vite HMR WebSocket connection errors in sandbox iframe environment
+      window.addEventListener('unhandledrejection', function (e) {
+        var reason = e && e.reason;
+        var msg = (reason && (reason.message || reason.stack || String(reason))) || '';
+        if (
+          msg.includes('WebSocket') ||
+          msg.includes('closed without opened') ||
+          msg.includes('@vite/client')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+      window.addEventListener('error', function (e) {
+        var msg = (e && (e.message || e.filename || '')) || '';
+        if (msg.includes('WebSocket') || msg.includes('@vite/client')) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+    </script>
+  </head>
+  <body class="bg-[#070A10] text-[#F8FAFC] antialiased selection:bg-[#CCFF00] selection:text-[#070A10] overflow-hidden">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
