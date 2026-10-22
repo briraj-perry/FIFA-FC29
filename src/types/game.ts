@@ -281,7 +281,7 @@ export interface GraphicsSettings {
   bloomEnabled: boolean;
   bloomStrength: number;
   crowdAnimation: boolean;
-  ipadControls: boolean; // Shows on-screen iPad / Touch virtual thumbstick & skill pad
+  ipadControls: boolean; // Shows on-screen Phone / iPad / Touch virtual thumbstick & skill pad
 }
 
 export type FormationId =
@@ -465,7 +465,9 @@ export const DEFAULT_EQUIPMENT: PlayerEquipmentLoadout = {
 
 const isTouchCapableDevice =
   typeof window !== 'undefined' &&
-  ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  ('ontouchstart' in window ||
+    navigator.maxTouchPoints > 0 ||
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
 
 export const DEFAULT_GRAPHICS: GraphicsSettings = {
   stadium: 'santiago_bernabeu',
@@ -476,7 +478,7 @@ export const DEFAULT_GRAPHICS: GraphicsSettings = {
   bloomEnabled: false,
   bloomStrength: 0.03, // Ultra-subtle floodlight halo only when enabled
   crowdAnimation: true,
-  ipadControls: isTouchCapableDevice, // Automatically enabled on iPad/touch, toggleable anytime!
+  ipadControls: isTouchCapableDevice, // Automatically enabled on Phone/iPad/touch, toggleable anytime!
 };
 
 export const DEFAULT_AI_TACTICS: AITacticalConfig = {

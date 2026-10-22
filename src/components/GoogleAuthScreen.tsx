@@ -40,7 +40,7 @@ export const GoogleAuthScreen: React.FC<GoogleAuthScreenProps> = ({
       {/* Background ambient lighting glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[540px] h-[340px] bg-gradient-to-r from-emerald-500/15 via-cyan-500/15 to-blue-500/15 blur-3xl rounded-full pointer-events-none" />
 
-      <div className="relative w-full max-w-md bg-[#090D16]/95 border border-white/15 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col items-center text-center">
+      <div className="relative w-full max-w-md bg-[#090D16]/95 border border-white/15 rounded-3xl p-5 sm:p-8 shadow-2xl flex flex-col items-center text-center my-auto max-h-[96vh] overflow-y-auto">
         {/* FC 26 Brand Crest */}
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-500 p-0.5 shadow-xl shadow-emerald-500/20 mb-4">
           <div className="w-full h-full bg-[#090D16] rounded-2xl flex items-center justify-center">

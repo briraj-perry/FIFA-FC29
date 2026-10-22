@@ -37,8 +37,8 @@ export const PostMatchProgressionModal: React.FC<PostMatchProgressionModalProps>
     progressionResult?.coinsGained ?? (isWin ? 10000 : isDraw ? 2500 : 1000);
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-[#05080F]/90 backdrop-blur-xl select-none overflow-y-auto">
-      <div className="relative w-full max-w-xl bg-[#090D16] border border-white/15 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col items-center text-center">
+    <div className="fixed inset-0 z-40 flex items-center justify-center p-3 sm:p-5 bg-[#05080F]/90 backdrop-blur-xl select-none overflow-y-auto">
+      <div className="relative w-full max-w-xl bg-[#090D16] border border-white/15 rounded-3xl p-4 sm:p-8 shadow-2xl flex flex-col items-center text-center my-auto max-h-[96vh] overflow-y-auto">
         {/* Top Trophy / Match Result Crest */}
         <div
           className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-xl mb-4 border ${

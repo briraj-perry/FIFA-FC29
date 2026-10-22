@@ -2401,8 +2401,15 @@ export const FootballCanvas: React.FC<FootballCanvasProps> = ({
       const w = container.clientWidth || window.innerWidth;
       const h = container.clientHeight || window.innerHeight;
       camera.aspect = w / h;
-      // Widen vertical FOV slightly on portrait / 4:3 iPad screens so the full pitch fits
-      camera.fov = camera.aspect < 1.0 ? 48 : camera.aspect < 1.45 ? 42 : 38;
+      // Widen vertical FOV on mobile phone portrait / iPad screens so the full pitch fits cleanly
+      camera.fov =
+        camera.aspect < 0.68
+          ? 56
+          : camera.aspect < 1.0
+          ? 48
+          : camera.aspect < 1.45
+          ? 42
+          : 38;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
       composer.setSize(w, h);
@@ -4575,11 +4582,11 @@ export const FootballCanvas: React.FC<FootballCanvasProps> = ({
         stadium.supporterFlagsMesh.instanceMatrix.needsUpdate = true;
       }
 
-      // Adaptive aspect-ratio scaling so iPad (4:3 & portrait) fits the pitch while staying well inside the enlarged stadium bowl
+      // Adaptive aspect-ratio scaling so Phones & iPads (portrait & landscape) fit the pitch cleanly
       const aspectScale = THREE.MathUtils.clamp(
-        1.62 / Math.max(0.75, camera.aspect),
+        1.62 / Math.max(0.48, camera.aspect),
         1.0,
-        1.18
+        1.38
       );
       const isIpadHUD = graphicsRef.current.ipadControls;
 

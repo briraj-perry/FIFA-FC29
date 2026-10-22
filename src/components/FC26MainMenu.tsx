@@ -2,6 +2,7 @@ import React from 'react';
 import { ProgressionService } from '../services/progressionService';
 import { CAREER_RANKS, UserCareerProfile } from '../types/progression';
 import { soundEngine } from '../audio/soundEngine';
+import { requestFullscreenLandscape, triggerHaptic } from '../utils/mobileDetection';
 
 interface FC26MainMenuProps {
   profile: UserCareerProfile;
@@ -130,7 +131,22 @@ export const FC26MainMenu: React.FC<FC26MainMenuProps> = ({
         </div>
 
         {/* Right: Google User Profile & Logout */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          {/* Mobile Fullscreen Landscape Toggle */}
+          <button
+            type="button"
+            onClick={async () => {
+              soundEngine.playUIClick();
+              triggerHaptic(15);
+              await requestFullscreenLandscape();
+            }}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-[#CCFF00] border border-[#CCFF00]/40 text-xs font-bold transition-colors cursor-pointer"
+            title="Fullscreen Landscape (Recommended for Mobile)"
+          >
+            <span>⛶</span>
+            <span className="hidden sm:inline text-[10px]">Fullscreen</span>
+          </button>
+
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#111827] border border-white/10">
             <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-xs text-white">
               {profile.displayName.charAt(0).toUpperCase()}

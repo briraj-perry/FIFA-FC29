@@ -24,6 +24,11 @@ import { TacticalOverrideCommand } from '../three/FootballCanvas';
 import { IPadTouchController } from './IPadTouchController';
 import { CornerKickDrawOverlay } from './CornerKickDrawOverlay';
 import { soundEngine } from '../audio/soundEngine';
+import {
+  isPhoneScreen,
+  requestFullscreenLandscape,
+  triggerHaptic,
+} from '../utils/mobileDetection';
 
 interface MatchBroadcastHUDProps {
   stats: MatchStats;
@@ -77,6 +82,17 @@ export const MatchBroadcastHUD: React.FC<MatchBroadcastHUDProps> = ({
   const [aiInsight, setAiInsight] = useState<AICoachInsight | null>(null);
   const [isLoadingInsight, setIsLoadingInsight] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [isPhone, setIsPhone] = useState<boolean>(() => isPhoneScreen());
+
+  useEffect(() => {
+    const onResize = () => setIsPhone(isPhoneScreen());
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('orientationchange', onResize);
+    };
+  }, []);
 
   useEffect(() => {
     if (graphics.ipadControls) {
@@ -141,192 +157,176 @@ export const MatchBroadcastHUD: React.FC<MatchBroadcastHUDProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-10 pointer-events-none flex flex-col justify-between p-2.5 sm:p-4 max-h-[100dvh] overflow-hidden">
-      {/* Top Perimeter Row: FC 26 Broadcast Scorebug (Left) & Quick Actions (Right) */}
-      <div className="flex flex-wrap items-start justify-between gap-2 w-full">
-        {/* Top-Left Broadcast Scoreboard + Live xG & Active Player Tag */}
-        <div className="pointer-events-auto flex flex-col gap-1">
-          <div className="flex items-center bg-[#090D16]/95 border border-white/15 rounded-lg overflow-hidden shadow-xl">
-            <div className="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-[#CCFF00] text-[#070A10] font-display font-extrabold text-sm sm:text-base tracking-wider uppercase">
+    <div className="fixed inset-0 z-10 pointer-events-none flex flex-col justify-between p-1.5 sm:p-3 max-h-[100dvh] overflow-hidden">
+      {/* Top Perimeter Row: Ultra-Compact Single Row Broadcast Header */}
+      <div className="flex items-center justify-between gap-1 sm:gap-2 w-full">
+        {/* Top-Left Broadcast Scoreboard */}
+        <div className="pointer-events-auto flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center bg-[#090D16]/95 border border-white/15 rounded-lg overflow-hidden shadow-xl h-7 sm:h-8">
+            <div className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-[#CCFF00] text-[#070A10] font-display font-extrabold text-xs sm:text-sm tracking-wider uppercase flex items-center">
               FC 26
             </div>
 
             {/* Home Team */}
-            <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5">
+            <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1">
               <span
-                className="w-2.5 h-3.5 sm:w-3 sm:h-4 rounded-xs border border-white/20 shrink-0"
+                className="w-2 h-3 sm:w-2.5 sm:h-3.5 rounded-xs border border-white/20 shrink-0"
                 style={{ backgroundColor: equipment.kitPrimaryColor }}
               />
-              <span className="font-display font-bold text-base sm:text-lg tracking-wide text-white">
+              <span className="font-display font-bold text-xs sm:text-sm tracking-wide text-white">
                 RMA
               </span>
-              <span className="font-mono-tabular font-bold text-lg sm:text-xl text-[#CCFF00] px-0.5">
+              <span className="font-mono-tabular font-bold text-xs sm:text-base text-[#CCFF00] px-0.5">
                 {stats.homeScore}
               </span>
             </div>
 
-            <div className="h-5 w-px bg-white/15" />
+            <div className="h-3.5 w-px bg-white/15" />
 
             {/* Away Team */}
-            <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5">
-              <span className="font-mono-tabular font-bold text-lg sm:text-xl text-white px-0.5">
+            <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1">
+              <span className="font-mono-tabular font-bold text-xs sm:text-base text-white px-0.5">
                 {stats.awayScore}
               </span>
-              <span className="font-display font-bold text-base sm:text-lg tracking-wide text-slate-200">
+              <span className="font-display font-bold text-xs sm:text-sm tracking-wide text-slate-200">
                 MCI
               </span>
               <span
-                className="w-2.5 h-3.5 sm:w-3 sm:h-4 rounded-xs border border-white/20 shrink-0"
+                className="w-2 h-3 sm:w-2.5 sm:h-3.5 rounded-xs border border-white/20 shrink-0"
                 style={{ backgroundColor: resolveAwayKitPalette(equipment).primary }}
               />
             </div>
 
             {/* Match Clock & Half */}
-            <div className="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-[#111827] border-l border-white/10 font-mono-tabular text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-1.5">
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-[#CCFF00]">
+            <div className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-[#111827] border-l border-white/10 font-mono-tabular text-[10px] sm:text-xs font-bold text-slate-200 flex items-center gap-1">
+              <span className="text-[9px] px-1 py-0.2 rounded bg-white/10 text-[#CCFF00]">
                 {stats.currentHalf === 2 ? '2H' : '1H'}
               </span>
               <span>{clockFormatted}</span>
             </div>
 
-            {/* Live Match Telemetry (Possession, xG & Corners) */}
-            <div className="hidden xl:flex items-center gap-2.5 px-3 py-2 text-xs text-slate-300 border-l border-white/10 font-mono-tabular">
-              <span className="font-semibold text-[#CCFF00]">
-                {gameMode === 'ONLINE_MULTIPLAYER'
-                  ? `ONLINE #${onlineState.roomId || 'LIVE'} (${onlineState.role})`
-                  : gameMode === 'AI_VS_AI'
-                  ? 'AI MODE'
-                  : 'USER VS AI'}
+            {/* Active player badge on tablets/desktop */}
+            <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 border-l border-white/10 text-[10px] font-mono-tabular text-slate-300">
+              <span className="text-[#CCFF00] font-bold">
+                #{stats.activePlayerNumber} {stats.activePlayerName}
               </span>
-              <span aria-hidden="true">·</span>
-              <span>POSS {homePossPct}%</span>
-              <span aria-hidden="true">·</span>
-              <span>
-                xG {stats.homeXG.toFixed(2)} - {stats.awayXG.toFixed(2)}
-              </span>
-              <span aria-hidden="true">·</span>
-              <span>
-                CORNERS {stats.homeCorners}-{stats.awayCorners}
-              </span>
+              {stats.activePlayerOvr && (
+                <span className="text-amber-300 font-bold">OVR {stats.activePlayerOvr}</span>
+              )}
+              <span className="text-emerald-400">STA {stats.activePlayerStamina}%</span>
             </div>
-          </div>
-
-          {/* Sub-Ticker: Active Player + OVR/Speed/Shot + Sprint & Shot Power Indicator */}
-          <div className="flex flex-wrap items-center gap-2 px-2.5 py-1 bg-[#090D16]/90 border border-white/10 rounded text-[11px] text-slate-300 font-mono-tabular">
-            <span className="text-[#CCFF00] font-bold">
-              #{stats.activePlayerNumber} {stats.activePlayerName}
-            </span>
-            {stats.activePlayerOvr && (
-              <span className="px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40 text-[10px] font-black">
-                OVR {stats.activePlayerOvr}
-              </span>
-            )}
-            {stats.activePlayerPace && stats.activePlayerShooting && (
-              <span className="text-[10px] text-slate-300">
-                ⚡PAC {stats.activePlayerPace} · 💥SHO {stats.activePlayerShooting}
-              </span>
-            )}
-            <span aria-hidden="true">·</span>
-            <span className="text-emerald-400">STA {stats.activePlayerStamina}%</span>
-            {stats.isSprinting && (
-              <span className="px-1.5 py-0.2 rounded bg-[#CCFF00] text-slate-950 text-[10px] font-black uppercase animate-pulse">
-                ⚡ SPRINTING
-              </span>
-            )}
-            {stats.shotPowerCharge > 0 && (
-              <>
-                <span aria-hidden="true">·</span>
-                <span className="text-[#EF4444] font-bold">
-                  POWER {stats.shotPowerCharge}%
-                </span>
-              </>
-            )}
-            <span aria-hidden="true" className="hidden md:inline">·</span>
-            <span className="hidden md:inline text-slate-200 truncate max-w-[280px]">
-              {stats.aiCurrentAction}
-            </span>
           </div>
         </div>
 
-        {/* Top-Right Quick Action Controls */}
-        <div className="pointer-events-auto flex flex-wrap items-center gap-1 bg-[#090D16]/95 border border-white/15 p-1 rounded-lg shadow-xl">
-          {/* iPad / Touch Controls Toggle */}
+        {/* Top-Right Quick Action Controls: Single sleek 28px bar */}
+        <div className="pointer-events-auto flex items-center gap-1 bg-[#090D16]/95 border border-white/15 p-0.5 sm:p-1 rounded-lg shadow-xl h-7 sm:h-8">
+          {/* Fullscreen / Landscape Toggle */}
+          <button
+            onClick={async () => {
+              soundEngine.playUIClick();
+              triggerHaptic(15);
+              await requestFullscreenLandscape();
+            }}
+            className="px-2 py-1 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded bg-[#111827] text-[#CCFF00] hover:text-white border border-[#CCFF00]/40 transition-colors whitespace-nowrap shrink-0 cursor-pointer h-full flex items-center justify-center"
+            title="Fullscreen Landscape (Edge-to-Edge)"
+          >
+            {isPhone ? '⛶' : '⛶ Landscape'}
+          </button>
+
+          {/* Touch Gamepad Controls Toggle */}
           <button
             onClick={() => {
               soundEngine.playUIClick();
+              triggerHaptic(12);
               onChangeGraphics({
                 ...graphics,
                 ipadControls: !graphics.ipadControls,
               });
             }}
-            className={`px-3 py-1.5 text-xs font-bold rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+            className={`px-2 py-1 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer h-full flex items-center justify-center ${
               graphics.ipadControls
                 ? 'bg-[#CCFF00] text-[#070A10]'
                 : 'bg-[#111827] text-slate-200 hover:text-white'
             }`}
+            title="Toggle On-Screen Touch Gamepad"
           >
-            {graphics.ipadControls ? 'iPad Controls: ON' : 'iPad Controls'}
+            {isPhone ? '📱' : graphics.ipadControls ? 'Touch: ON' : 'Touch Controls'}
           </button>
 
-          {/* Online Multiplayer Room Button */}
+          {/* Online Room Button on Desktop */}
+          {!isPhone && (
+            <button
+              onClick={() => {
+                soundEngine.playUIClick();
+                triggerHaptic(12);
+                onOpenOnlineLobby();
+              }}
+              className={`px-2.5 py-1 text-xs font-bold rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer h-full flex items-center justify-center ${
+                gameMode === 'ONLINE_MULTIPLAYER'
+                  ? 'bg-emerald-400 text-[#070A10]'
+                  : 'bg-[#111827] text-[#38BDF8] hover:text-white border border-[#38BDF8]/30'
+              }`}
+              title="Online 1v1 & Friend Match"
+            >
+              {onlineState.roomId ? `#${onlineState.roomId}` : 'Online'}
+            </button>
+          )}
+
+          {/* AI vs AI Mode Toggle on Desktop */}
+          {!isPhone && (
+            <button
+              onClick={() => {
+                soundEngine.playUIClick();
+                triggerHaptic(12);
+                onToggleGameMode(gameMode === 'AI_VS_AI' ? 'PLAYER_VS_AI' : 'AI_VS_AI');
+              }}
+              className={`px-2.5 py-1 text-xs font-bold rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer h-full flex items-center justify-center ${
+                gameMode === 'AI_VS_AI'
+                  ? 'bg-[#38BDF8] text-[#070A10]'
+                  : 'bg-[#111827] text-slate-200 hover:text-white'
+              }`}
+              title="Autonomous Tactical AI Mode"
+            >
+              {gameMode === 'AI_VS_AI' ? 'AI: ON' : 'AI Mode'}
+            </button>
+          )}
+
+          {/* Gear Customizer */}
           <button
             onClick={() => {
               soundEngine.playUIClick();
-              onOpenOnlineLobby();
-            }}
-            className={`px-3 py-1.5 text-xs font-bold rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-              gameMode === 'ONLINE_MULTIPLAYER'
-                ? 'bg-emerald-400 text-[#070A10]'
-                : 'bg-[#111827] text-[#38BDF8] hover:text-white border border-[#38BDF8]/30'
-            }`}
-          >
-            {onlineState.roomId
-              ? `Online Room #${onlineState.roomId}`
-              : 'Play Online'}
-          </button>
-
-          <button
-            onClick={() => {
-              soundEngine.playUIClick();
-              onToggleGameMode(
-                gameMode === 'AI_VS_AI' ? 'PLAYER_VS_AI' : 'AI_VS_AI'
-              );
-            }}
-            className={`px-3 py-1.5 text-xs font-bold rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-              gameMode === 'AI_VS_AI'
-                ? 'bg-[#38BDF8] text-[#070A10]'
-                : 'bg-[#111827] text-slate-200 hover:text-white'
-            }`}
-          >
-            {gameMode === 'AI_VS_AI' ? 'AI Mode: ON' : 'AI Mode'}
-          </button>
-
-          <button
-            onClick={() => {
-              soundEngine.playUIClick();
+              triggerHaptic(12);
               onOpenCustomizer();
             }}
-            className="px-3 py-1.5 text-xs font-bold bg-[#CCFF00] text-[#070A10] hover:bg-[#d9ff33] rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            className="px-2 py-1 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs font-bold bg-[#CCFF00] text-[#070A10] hover:bg-[#d9ff33] rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer h-full flex items-center justify-center"
+            title="Gear / Boots / Jersey Customizer"
           >
-            Gear
+            {isPhone ? '⚙' : 'Gear'}
           </button>
 
+          {/* Audio Toggle */}
           <button
-            onClick={onToggleMute}
-            className="px-2.5 py-1.5 text-xs font-semibold bg-[#111827] text-slate-300 hover:text-white rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            title="Toggle Crowd & Match Audio"
+            onClick={() => {
+              triggerHaptic(12);
+              onToggleMute();
+            }}
+            className="px-1.5 sm:px-2 py-1 text-[11px] sm:text-xs font-semibold bg-[#111827] text-slate-300 hover:text-white rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer h-full flex items-center justify-center"
+            title="Toggle Audio"
           >
-            {muted ? 'Muted' : 'Audio'}
+            {muted ? '🔇' : '🔊'}
           </button>
 
+          {/* Pause Button */}
           <button
             onClick={() => {
               soundEngine.playUIClick();
+              triggerHaptic(15);
               onOpenPauseModal();
             }}
-            className="px-2.5 py-1.5 text-xs font-semibold bg-[#111827] text-slate-300 hover:text-white rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            className="px-2 py-1 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer h-full flex items-center justify-center"
+            title="Pause Match"
           >
-            Pause
+            {isPhone ? '⏸' : 'Pause'}
           </button>
         </div>
       </div>
@@ -471,22 +471,23 @@ export const MatchBroadcastHUD: React.FC<MatchBroadcastHUDProps> = ({
           </div>
         )}
 
-        {/* Unified Collapsible Bottom Dock */}
-        <div className="pointer-events-none w-full max-w-[960px] flex flex-col items-center">
-          <button
-            onClick={() => {
-              soundEngine.playUIClick();
-              setDockCollapsed((prev) => !prev);
-            }}
-            className="pointer-events-auto px-4 py-1 text-xs font-semibold tracking-wide text-slate-300 hover:text-white bg-[#090D16]/95 border border-b-0 border-white/15 rounded-t-lg cursor-pointer whitespace-nowrap shrink-0"
-          >
-            {dockCollapsed
-              ? '▴ Show AI Tactics, Skill Moves & Stadium Dock (H)'
-              : '▾ Hide Controls · Cinema Pitch View (H)'}
-          </button>
+        {/* Unified Collapsible Bottom Dock (Hidden when Touch Gamepad or Phone Screen is Active) */}
+        {!graphics.ipadControls && !isPhone && (
+          <div className="pointer-events-none w-full max-w-[960px] flex flex-col items-center">
+            <button
+              onClick={() => {
+                soundEngine.playUIClick();
+                setDockCollapsed((prev) => !prev);
+              }}
+              className="pointer-events-auto px-4 py-1 text-xs font-semibold tracking-wide text-slate-300 hover:text-white bg-[#090D16]/95 border border-b-0 border-white/15 rounded-t-lg cursor-pointer whitespace-nowrap shrink-0"
+            >
+              {dockCollapsed
+                ? '▴ Show AI Tactics, Skill Moves & Stadium Dock (H)'
+                : '▾ Hide Controls · Cinema Pitch View (H)'}
+            </button>
 
-          {!dockCollapsed && (
-            <div className="pointer-events-auto w-full bg-[#090D16]/95 border border-white/15 rounded-xl p-3.5 shadow-2xl">
+            {!dockCollapsed && (
+              <div className="pointer-events-auto w-full bg-[#090D16]/95 border border-white/15 rounded-xl p-3.5 shadow-2xl">
               {/* Dock Header Tabs + Control Hint */}
               <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-white/10">
                 <div className="flex flex-wrap items-center gap-1 bg-[#111827] p-1 rounded-lg">
@@ -932,6 +933,7 @@ export const MatchBroadcastHUD: React.FC<MatchBroadcastHUDProps> = ({
             </div>
           )}
         </div>
+        )}
       </div>
     </div>
   );

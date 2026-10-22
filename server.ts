@@ -938,7 +938,7 @@ async function fetchHostPublicIp(): Promise<string> {
     const res = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(3500) });
     const data = await res.json();
     if (data?.ip) {
-      hostPublicIp = data.ip;
+      hostPublicIp = String(data.ip);
       return hostPublicIp;
     }
   } catch {

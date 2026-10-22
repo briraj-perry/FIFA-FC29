@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { TouchControllerInput } from '../types/game';
+import { isPhoneScreen, triggerHaptic } from '../utils/mobileDetection';
 
 interface CornerKickDrawOverlayProps {
   takerName: string;
@@ -270,6 +271,7 @@ export const CornerKickDrawOverlay: React.FC<CornerKickDrawOverlayProps> = ({
   };
 
   const applyPreset = (preset: CornerPreset, label: string) => {
+    triggerHaptic(12);
     setActivePreset(preset);
     setTargetLabel(label);
     const pts = generatePresetPoints(preset);
@@ -279,18 +281,22 @@ export const CornerKickDrawOverlay: React.FC<CornerKickDrawOverlayProps> = ({
   };
 
   const executeKick = () => {
+    triggerHaptic([20, 40, 20]);
     touchInputRef.current.pendingCornerKick = true;
     touchInputRef.current.cornerArcHeight = arcHeight;
     if (onExecuteKick) onExecuteKick();
   };
 
   const clearAndRedraw = () => {
+    triggerHaptic(10);
     setActivePreset(null);
     setPoints([]);
     touchInputRef.current.cornerPathPoints = [];
     touchInputRef.current.cornerPreset = null;
     setTargetLabel('Draw ball path towards the penalty box with finger or mouse!');
   };
+
+  const isPhone = isPhoneScreen();
 
   return (
     <div
@@ -307,100 +313,101 @@ export const CornerKickDrawOverlay: React.FC<CornerKickDrawOverlayProps> = ({
       />
 
       {/* Top First-Person Header Badge */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none">
-        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 backdrop-blur-md border border-amber-400/60 shadow-xl shadow-amber-500/10">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
-          <span className="text-[11px] font-black tracking-widest text-amber-300 uppercase">
-            1ST PERSON CORNER KICK · {takerName || 'CORNER TAKER'}
+      <div className="absolute top-2.5 sm:top-4 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none px-2 max-w-full">
+        <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-slate-900/90 backdrop-blur-md border border-amber-400/60 shadow-xl shadow-amber-500/10">
+          <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-400 animate-ping" />
+          <span className="text-[10px] sm:text-[11px] font-black tracking-wider uppercase text-amber-300">
+            1ST PERSON CORNER · {takerName || 'TAKER'}
           </span>
-          <span className="text-[10px] text-slate-400 font-bold border-l border-slate-700 pl-2">
+          <span className="text-[9px] sm:text-[10px] text-slate-400 font-bold border-l border-slate-700 pl-1.5 sm:pl-2">
             {teamLabel}
           </span>
         </div>
 
         {/* Dynamic Target Banner */}
-        <div className="mt-2 flex items-center gap-2 px-3.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-emerald-500/50 text-emerald-400 text-xs font-bold shadow-lg">
+        <div className="mt-1 sm:mt-2 flex items-center gap-1.5 px-3 py-0.5 sm:py-1 rounded-lg bg-black/80 backdrop-blur-md border border-emerald-500/50 text-emerald-400 text-[11px] sm:text-xs font-bold shadow-lg">
           <span>{targetLabel}</span>
         </div>
 
         {/* Instruction Guidance */}
-        <div className="mt-1 text-[11px] text-slate-300 font-medium drop-shadow-md">
+        <div className="mt-1 text-[10px] sm:text-[11px] text-slate-300 font-medium drop-shadow-md text-center">
           {isDrawing
             ? 'Release to lock trajectory or draw more curve!'
-            : '✍️ Draw with finger/mouse to curve the ball, or choose a tactical preset below'}
+            : '✍️ Draw with finger to curve the ball, or pick a preset'}
         </div>
       </div>
 
       {/* Bottom Controls Dock (Presets, Arc Height, Redraw & Execute) */}
       <div
-        className="absolute bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-auto"
+        className="absolute bottom-2 sm:bottom-5 inset-x-2 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 flex flex-col items-center gap-1.5 sm:gap-2 pointer-events-auto pb-[env(safe-area-inset-bottom,4px)]"
         onPointerDown={(e) => e.stopPropagation()}
       >
         {/* Tactical Quick Presets Row */}
-        <div className="flex flex-wrap items-center justify-center gap-1.5 p-1.5 rounded-xl bg-slate-900/90 backdrop-blur-lg border border-slate-700/80 shadow-2xl">
+        <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-xl bg-slate-900/92 backdrop-blur-lg border border-slate-700/80 shadow-2xl max-w-full">
           <button
             type="button"
             onClick={() => applyPreset('PENALTY_SPOT', '👑 BELLINGHAM · PENALTY SPOT HEADER')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+            className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-black transition-all flex items-center gap-1 ${
               activePreset === 'PENALTY_SPOT'
                 ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/40 scale-105'
                 : 'bg-slate-800 text-slate-200 hover:bg-slate-700'
             }`}
           >
-            👑 Penalty Spot (Bellingham)
+            👑 Penalty {isPhone ? '' : 'Spot'}
           </button>
 
           <button
             type="button"
             onClick={() => applyPreset('NEAR_POST', '⚡ MBAPPÉ · NEAR POST FLICK')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+            className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-black transition-all flex items-center gap-1 ${
               activePreset === 'NEAR_POST'
                 ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/40 scale-105'
                 : 'bg-slate-800 text-slate-200 hover:bg-slate-700'
             }`}
           >
-            ⚡ Near Post (Mbappé)
+            ⚡ Near Post
           </button>
 
           <button
             type="button"
             onClick={() => applyPreset('FAR_POST', '🚀 VALVERDE · FAR POST VOLLEY')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+            className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-black transition-all flex items-center gap-1 ${
               activePreset === 'FAR_POST'
                 ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/40 scale-105'
                 : 'bg-slate-800 text-slate-200 hover:bg-slate-700'
             }`}
           >
-            🚀 Far Post Volley
+            🚀 Far Post
           </button>
 
           <button
             type="button"
             onClick={() => applyPreset('OLIMPICO', '🔥 OLIMPICO · DIRECT GOAL CURL')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+            className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-black transition-all flex items-center gap-1 ${
               activePreset === 'OLIMPICO'
                 ? 'bg-rose-500 text-white shadow-md shadow-rose-500/40 scale-105'
                 : 'bg-slate-800 text-rose-300 hover:bg-slate-700'
             }`}
           >
-            🔥 Olimpico Goal Curl
+            🔥 Olimpico
           </button>
         </div>
 
-        {/* Action Row: Arc Height Selector, Redraw, and Giant Execute Button */}
-        <div className="flex items-center gap-2">
+        {/* Action Row: Arc Height Selector, Redraw, and Execute Button */}
+        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
           {/* Arc Height Choice */}
           <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-900/90 backdrop-blur-lg border border-slate-700/80">
-            <span className="text-[10px] font-black uppercase text-slate-400 px-1.5">ARC:</span>
+            <span className="text-[9px] sm:text-[10px] font-black uppercase text-slate-400 px-1">ARC:</span>
             {(['LOW', 'MEDIUM', 'HIGH'] as ArcHeight[]).map((h) => (
               <button
                 key={h}
                 type="button"
                 onClick={() => {
+                  triggerHaptic(10);
                   setArcHeight(h);
                   touchInputRef.current.cornerArcHeight = h;
                 }}
-                className={`px-2 py-1 rounded text-[10px] font-black transition-all ${
+                className={`px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[9px] sm:text-[10px] font-black transition-all ${
                   arcHeight === h
                     ? 'bg-cyan-500 text-slate-950 shadow-sm'
                     : 'text-slate-400 hover:text-white'
@@ -415,18 +422,18 @@ export const CornerKickDrawOverlay: React.FC<CornerKickDrawOverlayProps> = ({
           <button
             type="button"
             onClick={clearAndRedraw}
-            className="px-3.5 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-1.5 shadow-lg active:scale-95 transition-all"
+            className="px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[11px] sm:text-xs font-bold flex items-center gap-1 shadow-lg active:scale-95 transition-all"
           >
             ↺ Redraw
           </button>
 
-          {/* Giant Execute Kick Button */}
+          {/* Execute Kick Button */}
           <button
             type="button"
             onClick={executeKick}
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-sm tracking-wide shadow-xl shadow-emerald-500/30 flex items-center gap-2 border border-emerald-300/60 active:scale-95 transition-all animate-pulse"
+            className="px-4 py-1.5 sm:px-6 sm:py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-xs sm:text-sm tracking-wide shadow-xl shadow-emerald-500/30 flex items-center gap-1.5 border border-emerald-300/60 active:scale-95 transition-all animate-pulse"
           >
-            <span>⚡ EXECUTE CORNER KICK</span>
+            <span>⚡ KICK CORNER</span>
           </button>
         </div>
       </div>

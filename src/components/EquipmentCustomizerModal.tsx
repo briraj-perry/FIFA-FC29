@@ -59,38 +59,38 @@ export const EquipmentCustomizerModal: React.FC<EquipmentCustomizerProps> = ({
   const currentBootSpec = BOOT_CATALOG[equipment.bootModel];
 
   return (
-    <div className="fixed inset-0 z-20 pointer-events-none flex flex-col justify-between p-5">
+    <div className="fixed inset-0 z-20 pointer-events-none flex flex-col justify-between p-2.5 sm:p-5 overflow-hidden">
       {/* Top Bar: Minimal Locker Room Spec Header & Camera Zoom Selector */}
-      <div className="pointer-events-auto flex flex-wrap items-center justify-between gap-4 bg-[#090D16]/95 border border-white/15 px-5 py-3 rounded-xl max-w-[1140px] w-full mx-auto">
-        <div className="flex items-center gap-4">
+      <div className="pointer-events-auto flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 bg-[#090D16]/95 border border-white/15 px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl max-w-[1140px] w-full mx-auto shadow-2xl backdrop-blur-md">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => {
               soundEngine.playUIClick();
               onBackToTitle();
             }}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            className="px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
           >
-            ← Title Screen
+            ← Menu
           </button>
           <div>
-            <h2 className="font-display text-2xl font-extrabold tracking-wide uppercase text-white leading-none">
-              Pro Locker Room · 3D Equipment Lab
+            <h2 className="font-display text-lg sm:text-2xl font-extrabold tracking-wide uppercase text-white leading-none">
+              Pro Locker Room · 3D Lab
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Drag anywhere on the 3D player to rotate 360° · Real-time PBR Clearcoat & Stud Preview
+            <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5 hidden sm:block">
+              Drag anywhere to rotate 360° · Real-time PBR Clearcoat & Stud Preview
             </p>
           </div>
         </div>
 
         {/* Camera Inspection Focus Selector */}
-        <div className="flex items-center gap-1 bg-[#111827] p-1 rounded-lg border border-white/10">
+        <div className="flex items-center gap-1 bg-[#111827] p-1 rounded-lg border border-white/10 overflow-x-auto max-w-full">
           {(
             [
-              { id: 'FULL_BODY', label: 'Full Body' },
-              { id: 'BOOTS', label: 'Boots & Studs' },
-              { id: 'UPPER_KIT', label: 'Kit & Crest' },
-              { id: 'HEADGEAR', label: 'Headgear' },
-              { id: 'BALL', label: 'Match Ball' },
+              { id: 'FULL_BODY', label: 'Full' },
+              { id: 'BOOTS', label: 'Boots' },
+              { id: 'UPPER_KIT', label: 'Kit' },
+              { id: 'HEADGEAR', label: 'Gear' },
+              { id: 'BALL', label: 'Ball' },
             ] as const
           ).map((cam) => (
             <button
@@ -99,7 +99,7 @@ export const EquipmentCustomizerModal: React.FC<EquipmentCustomizerProps> = ({
                 soundEngine.playUIClick();
                 onChangeZoomTarget(cam.id);
               }}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 zoomTarget === cam.id
                   ? 'bg-[#CCFF00] text-[#070A10]'
                   : 'text-slate-300 hover:text-white'
@@ -115,9 +115,9 @@ export const EquipmentCustomizerModal: React.FC<EquipmentCustomizerProps> = ({
             soundEngine.playUIClick();
             onCloseAndReturnToMatch();
           }}
-          className="px-5 py-2 text-xs font-bold uppercase tracking-wider bg-[#CCFF00] hover:bg-[#d8ff33] text-[#070A10] rounded-lg transition-transform active:scale-95 whitespace-nowrap shrink-0 cursor-pointer"
+          className="px-4 py-1.5 sm:px-5 sm:py-2 text-xs font-bold uppercase tracking-wider bg-[#CCFF00] hover:bg-[#d8ff33] text-[#070A10] rounded-lg transition-transform active:scale-95 whitespace-nowrap shrink-0 cursor-pointer shadow-lg"
         >
-          Save & Enter Pitch →
+          Save & Play →
         </button>
       </div>
 
@@ -139,8 +139,8 @@ export const EquipmentCustomizerModal: React.FC<EquipmentCustomizerProps> = ({
         {!dockCollapsed && (
           <div className="w-full bg-[#090D16]/95 border border-white/15 rounded-xl p-4 shadow-2xl">
             {/* Category Tabs + Active Player Telemetry Summary */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b border-white/10">
-              <div className="flex items-center gap-1.5 bg-[#111827] p-1 rounded-lg">
+            <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2.5 mb-2.5 border-b border-white/10">
+              <div className="flex items-center gap-1 sm:gap-1.5 bg-[#111827] p-1 rounded-lg overflow-x-auto max-w-full">
                 {(
                   [
                     { id: 'BOOTS', label: '1. Pro Boots & Cleats' },

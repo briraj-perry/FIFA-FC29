@@ -34,6 +34,8 @@ import { PostMatchProgressionModal } from './components/PostMatchProgressionModa
 import { ProgressionService } from './services/progressionService';
 import { UserCareerProfile } from './types/progression';
 import { soundEngine } from './audio/soundEngine';
+import { MobileOrientationBanner } from './components/MobileOrientationBanner';
+import { isPhoneScreen } from './utils/mobileDetection';
 
 const INITIAL_STATS: MatchStats = {
   homeScore: 0,
@@ -102,7 +104,10 @@ export default function App() {
     ...DEFAULT_GRAPHICS,
     ipadControls:
       typeof navigator !== 'undefined' &&
-      (navigator.maxTouchPoints > 0 || 'ontouchstart' in window),
+      (navigator.maxTouchPoints > 0 ||
+        'ontouchstart' in window ||
+        isPhoneScreen() ||
+        (typeof window !== 'undefined' && window.innerWidth < 1024)),
   }));
   const [aiTactics, setAiTactics] = useState<AITacticalConfig>(() => ({
     ...DEFAULT_AI_TACTICS,
@@ -760,6 +765,21 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [screenState, startKickOff]);
 
+  // Unlock web audio on first mobile screen touch or user interaction
+  useEffect(() => {
+    const unlockAudio = () => {
+      soundEngine.startStadiumAmbience();
+      window.removeEventListener('touchstart', unlockAudio);
+      window.removeEventListener('pointerdown', unlockAudio);
+    };
+    window.addEventListener('touchstart', unlockAudio, { passive: true });
+    window.addEventListener('pointerdown', unlockAudio, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', unlockAudio);
+      window.removeEventListener('pointerdown', unlockAudio);
+    };
+  }, []);
+
   const totalPoss = Math.max(1, stats.homePossessionFrames + stats.awayPossessionFrames);
   const homePossPct = Math.round((stats.homePossessionFrames / totalPoss) * 100);
   const currentBoot = BOOT_CATALOG[equipment.bootModel];
@@ -770,6 +790,8 @@ export default function App() {
 
   return (
     <main className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] overflow-hidden bg-[#05080F] select-none touch-none">
+      {/* Mobile Orientation Notification & Fullscreen Landscape Helper */}
+      <MobileOrientationBanner />
       {/* GLOBAL ON-SCREEN FRIEND REQUEST & MATCH INVITE NOTIFICATION OVERLAY (Visible whenever online) */}
       {(pendingFriendRequests.length > 0 || activeMatchInvites.length > 0 || friendAcceptedToast) && (
         <div className="fixed top-3 right-3 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-auto px-2">
@@ -1329,8 +1351,8 @@ export default function App() {
 
       {/* 5. HALF-TIME LOCKER ROOM & TACTICAL BREAK MODAL (45:00) */}
       {screenState === 'HALF_TIME' && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center p-6 bg-[#05080F]/88">
-          <div className="w-full max-w-xl bg-[#090D16] border border-[#CCFF00]/40 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-30 flex items-center justify-center p-3 sm:p-6 bg-[#05080F]/88 overflow-y-auto">
+          <div className="w-full max-w-xl bg-[#090D16] border border-[#CCFF00]/40 rounded-2xl p-4 sm:p-6 shadow-2xl my-auto max-h-[94vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
                 <div className="text-xs font-mono-tabular uppercase tracking-widest text-[#CCFF00]">
@@ -1490,8 +1512,8 @@ export default function App() {
 
       {/* 6B. MATCH PAUSE MODAL */}
       {screenState === 'PAUSED' && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center p-6 bg-[#05080F]/85 backdrop-blur-md">
-          <div className="w-full max-w-lg bg-[#090D16] border border-white/15 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-30 flex items-center justify-center p-3 sm:p-6 bg-[#05080F]/85 backdrop-blur-md overflow-y-auto">
+          <div className="w-full max-w-lg bg-[#090D16] border border-white/15 rounded-2xl p-4 sm:p-6 shadow-2xl my-auto max-h-[94vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
                 <div className="text-xs font-mono-tabular uppercase tracking-widest text-[#CCFF00]">

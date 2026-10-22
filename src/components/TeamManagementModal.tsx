@@ -84,6 +84,7 @@ export const TeamManagementModal: React.FC<TeamManagementModalProps> = ({
   const [starterIds, setStarterIds] = useState<string[]>([...profile.starterPlayerIds]);
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(null);
   const [roleFilter, setRoleFilter] = useState<'ALL' | PlayerRole>('ALL');
+  const [mobileTab, setMobileTab] = useState<'PITCH' | 'ROSTER'>('PITCH');
 
   const currentLayout = FORMATION_SLOT_LAYOUTS[selectedFormation] || FORMATION_SLOT_LAYOUTS['4-3-3 Attack'];
 
@@ -116,6 +117,10 @@ export const TeamManagementModal: React.FC<TeamManagementModalProps> = ({
     if (slot) {
       setRoleFilter(slot.role);
     }
+    // On mobile devices, automatically switch to the roster view so the user can immediately select a player
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setMobileTab('ROSTER');
+    }
   };
 
   const handleAssignPlayerToSlot = (playerId: string) => {
@@ -142,6 +147,9 @@ export const TeamManagementModal: React.FC<TeamManagementModalProps> = ({
     });
 
     setSelectedSlotIndex(null);
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setMobileTab('PITCH');
+    }
   };
 
   const handleSaveAndApply = () => {
@@ -166,10 +174,10 @@ export const TeamManagementModal: React.FC<TeamManagementModalProps> = ({
   });
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center p-3 sm:p-6 bg-[#05080F]/90 backdrop-blur-xl select-none overflow-y-auto">
-      <div className="relative w-full max-w-6xl max-h-[92vh] bg-[#090D16] border border-white/15 rounded-3xl p-5 sm:p-7 shadow-2xl flex flex-col gap-4 overflow-hidden">
+    <div className="fixed inset-0 z-40 flex items-center justify-center p-2 sm:p-5 bg-[#05080F]/90 backdrop-blur-xl select-none overflow-y-auto">
+      <div className="relative w-full max-w-6xl max-h-[94vh] bg-[#090D16] border border-white/15 rounded-3xl p-4 sm:p-7 shadow-2xl flex flex-col gap-3.5 sm:gap-4 overflow-y-auto">
         {/* Top Header: Title, Level, Live OVR & Save Button */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4 shrink-0">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3 sm:pb-4 shrink-0">
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono-tabular uppercase tracking-widest text-[#CCFF00] font-bold">
@@ -179,12 +187,12 @@ export const TeamManagementModal: React.FC<TeamManagementModalProps> = ({
                 {profile.rankTitle} · Lv.{profile.level}
               </span>
             </div>
-            <h2 className="font-display text-2xl font-black uppercase tracking-wide text-white mt-0.5">
+            <h2 className="font-display text-xl sm:text-2xl font-black uppercase tracking-wide text-white mt-0.5">
               Team Management & Roles
             </h2>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
             {onOpenPlayerDraft && (
               <button
                 type="button"
@@ -193,25 +201,25 @@ export const TeamManagementModal: React.FC<TeamManagementModalProps> = ({
                   onSaveLineup(starterIds, selectedFormation);
                   onOpenPlayerDraft();
                 }}
-                className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md cursor-pointer"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md cursor-pointer"
               >
-                🪙 Draft Players ({(profile.coins || 0).toLocaleString()} Coins)
+                🪙 Draft Players
               </button>
             )}
 
             {/* Live Squad OVR Display */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/30">
-              <span className="text-[10px] font-bold text-amber-400 uppercase">SQUAD OVR:</span>
-              <span className="font-display text-2xl font-black text-amber-300">{liveTeamOvr}</span>
-              <span className="text-[9px] text-slate-400 font-mono-tabular">
-                (+{profile.ovrBonus.toFixed(1)} Win Boost)
+            <div className="flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/30">
+              <span className="text-[10px] font-bold text-amber-400 uppercase">OVR:</span>
+              <span className="font-display text-xl sm:text-2xl font-black text-amber-300">{liveTeamOvr}</span>
+              <span className="text-[9px] text-slate-400 font-mono-tabular hidden sm:inline">
+                (+{profile.ovrBonus.toFixed(1)} Boost)
               </span>
             </div>
 
             <button
               type="button"
               onClick={handleSaveAndApply}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
             >
               Save Lineup ✔
             </button>
@@ -227,7 +235,7 @@ export const TeamManagementModal: React.FC<TeamManagementModalProps> = ({
         </div>
 
         {/* Formation Switcher Bar */}
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 shrink-0">
           <span className="text-xs font-bold text-slate-400 uppercase mr-1">Formation:</span>
           {FORMATIONS.map((f) => (
             <button
@@ -237,7 +245,7 @@ export const TeamManagementModal: React.FC<TeamManagementModalProps> = ({
                 soundEngine.playUIClick();
                 setSelectedFormation(f);
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all cursor-pointer ${
                 selectedFormation === f
                   ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30 scale-105'
                   : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-white/10'
@@ -248,10 +256,40 @@ export const TeamManagementModal: React.FC<TeamManagementModalProps> = ({
           ))}
         </div>
 
+        {/* Mobile View Toggle Switcher (Visible on Phone/Tablet) */}
+        <div className="flex lg:hidden items-center gap-1.5 p-1 bg-slate-900 rounded-xl border border-white/10 shrink-0">
+          <button
+            type="button"
+            onClick={() => setMobileTab('PITCH')}
+            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+              mobileTab === 'PITCH'
+                ? 'bg-cyan-500 text-slate-950 shadow'
+                : 'text-slate-300 hover:text-white'
+            }`}
+          >
+            ⚽ 2D Pitch Lineup
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('ROSTER')}
+            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+              mobileTab === 'ROSTER'
+                ? 'bg-emerald-500 text-slate-950 shadow'
+                : 'text-slate-300 hover:text-white'
+            }`}
+          >
+            📋 Squad Roster ({filteredPlayers.length})
+          </button>
+        </div>
+
         {/* Main Body: Interactive 2D Pitch on Left, Squad Roster Drawer on Right */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-0 overflow-hidden">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-0">
           {/* LEFT: 2D Interactive Pitch (7 cols) */}
-          <div className="lg:col-span-7 relative rounded-2xl bg-gradient-to-b from-[#0F3818] via-[#0D2F14] to-[#0A2610] border-2 border-emerald-500/40 p-4 shadow-inner flex flex-col justify-between overflow-hidden min-h-[380px]">
+          <div
+            className={`lg:col-span-7 relative rounded-2xl bg-gradient-to-b from-[#0F3818] via-[#0D2F14] to-[#0A2610] border-2 border-emerald-500/40 p-4 shadow-inner flex-col justify-between overflow-hidden min-h-[380px] ${
+              mobileTab === 'ROSTER' ? 'hidden lg:flex' : 'flex'
+            }`}
+          >
             {/* Pitch Markings (Center circle, penalty box, stripes) */}
             <div className="absolute inset-0 opacity-15 pointer-events-none flex">
               <div className="w-1/4 h-full border-r border-white/30" />
@@ -361,7 +399,11 @@ export const TeamManagementModal: React.FC<TeamManagementModalProps> = ({
           </div>
 
           {/* RIGHT: Squad Players List & Swap Drawer (5 cols) */}
-          <div className="lg:col-span-5 bg-[#0B111E] border border-white/10 rounded-2xl p-4 flex flex-col gap-3 min-h-0 overflow-hidden">
+          <div
+            className={`lg:col-span-5 bg-[#0B111E] border border-white/10 rounded-2xl p-3.5 sm:p-4 flex-col gap-3 min-h-0 ${
+              mobileTab === 'PITCH' ? 'hidden lg:flex' : 'flex'
+            }`}
+          >
             {/* Drawer Header & Role Filter Tabs */}
             <div className="shrink-0">
               <div className="flex items-center justify-between">
